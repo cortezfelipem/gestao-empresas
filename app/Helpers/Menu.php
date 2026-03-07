@@ -732,7 +732,148 @@ class Menu {
 		return $menu;
 	}
 
+	/**
+	 * Retorna o menu focado no produto MesaFacil (restaurantes/lanchonetes).
+	 * Apenas módulos relevantes para o nicho de food service são exibidos.
+	 * Para adicionar produtos derivados (ex: mecanica), crie um método análogo.
+	 */
+	private function getMenuMesaFacil(){
+		return [
+			[
+				'titulo' => 'Salão',
+				'icone' => $this->getIcone('Pedidos'),
+				'subs' => [
+					['nome' => 'Mesas',             'rota' => '/mesas'],
+					['nome' => 'Pedidos / Comandas', 'rota' => '/pedidos'],
+					['nome' => 'Controle de Comandas','rota' => '/pedidos/controleComandas'],
+				]
+			],
+			[
+				'titulo' => 'Cozinha',
+				'icone' => $this->getIcone('Eventos'),
+				'subs' => [
+					['nome' => 'Controle de Produção', 'rota' => '/controleCozinha/selecionar'],
+				]
+			],
+			[
+				'titulo' => 'Cardápio',
+				'icone' => $this->getIcone('Ecommerce'),
+				'subs' => [
+					['nome' => 'Categorias',             'rota' => '/deliveryCategoria'],
+					['nome' => 'Itens do Cardápio',      'rota' => '/deliveryProduto'],
+					['nome' => 'Complementos/Adicionais','rota' => '/deliveryComplemento'],
+					['nome' => 'Tamanhos de Pizza',      'rota' => '/tamanhosPizza'],
+				]
+			],
+			[
+				'titulo' => 'Delivery',
+				'icone' => $this->getIcone('Delivery'),
+				'subs' => [
+					['nome' => 'Pedidos de Delivery',  'rota' => '/pedidosDelivery'],
+					['nome' => 'Frente de Pedido',     'rota' => '/pedidosDelivery/frente'],
+					['nome' => 'Clientes Delivery',    'rota' => '/clientesDelivery'],
+					['nome' => 'Cupons / Promoções',   'rota' => '/codigoDesconto'],
+					['nome' => 'Taxas de Entrega',     'rota' => '/bairrosDelivery'],
+					['nome' => 'Configuração',         'rota' => '/configDelivery'],
+					['nome' => 'Funcionamento',        'rota' => '/funcionamentoDelivery'],
+				]
+			],
+			[
+				'titulo' => 'Caixa',
+				'icone' => $this->getIcone('Vendas'),
+				'subs' => [
+					['nome' => 'Abertura / Fechamento', 'rota' => '/caixa'],
+				]
+			],
+			[
+				'titulo' => 'Financeiro',
+				'icone' => $this->getIcone('Financeiro'),
+				'subs' => [
+					['nome' => 'Contas a Pagar',   'rota' => '/contasPagar'],
+					['nome' => 'Contas a Receber', 'rota' => '/contasReceber'],
+					['nome' => 'Fluxo de Caixa',   'rota' => '/fluxoCaixa'],
+					['nome' => 'Gráficos',         'rota' => '/graficos'],
+				]
+			],
+			[
+				'titulo' => 'Clientes',
+				'icone' => $this->getIcone('Cadastros'),
+				'subs' => [
+					['nome' => 'Clientes', 'rota' => '/clientes'],
+				]
+			],
+			[
+				'titulo' => 'Cadastros',
+				'icone' => $this->getIcone('Configurações'),
+				'subs' => [
+					['nome' => 'Categorias (Geral)',  'rota' => '/categorias'],
+					['nome' => 'Produtos (Geral)',    'rota' => '/produtos'],
+					['nome' => 'Formas de Pagamento', 'rota' => '/formasPagamento'],
+					['nome' => 'Usuários',            'rota' => '/usuarios'],
+				]
+			],
+			[
+				'titulo' => 'Relatórios',
+				'icone' => $this->getIcone('Relatórios'),
+				'subs' => [
+					['nome' => 'Relatórios', 'rota' => '/relatorios'],
+				]
+			],
+			[
+				'titulo' => 'Configurações',
+				'icone' => $this->getIcone('Configurações'),
+				'subs' => [
+					['nome' => 'Configurar Estabelecimento', 'rota' => '/configNF'],
+					['nome' => 'Suporte / Tickets',          'rota' => '/tickets'],
+				]
+			],
+		];
+	}
+
+	/**
+	 * Retorna a lista de rotas que pertencem ao contexto MesaFacil.
+	 * Usado pelo seeder e por validações de permissão.
+	 */
+	public static function rotasMesaFacil(){
+		return [
+			'/graficos',
+			'/mesas',
+			'/pedidos',
+			'/pedidos/controleComandas',
+			'/controleCozinha/selecionar',
+			'/deliveryCategoria',
+			'/deliveryProduto',
+			'/deliveryComplemento',
+			'/tamanhosPizza',
+			'/pedidosDelivery',
+			'/pedidosDelivery/frente',
+			'/clientesDelivery',
+			'/codigoDesconto',
+			'/bairrosDelivery',
+			'/configDelivery',
+			'/funcionamentoDelivery',
+			'/caixa',
+			'/contasPagar',
+			'/contasReceber',
+			'/fluxoCaixa',
+			'/clientes',
+			'/categorias',
+			'/produtos',
+			'/formasPagamento',
+			'/usuarios',
+			'/relatorios',
+			'/configNF',
+			'/tickets',
+		];
+	}
+
 	private function trataModulos($menu){
+		// MesaFacil: substitui o menu completo pelo menu focado em restaurantes
+		// Para outros produtos futuros (ex: mecanica), adicionar 'elseif' com método equivalente
+		if(getenv('PRODUTO_TIPO') === 'mesafacil'){
+			return $this->getMenuMesaFacil();
+		}
+
 		$temp = [];
 		foreach($menu as $m){
 			$add = true;

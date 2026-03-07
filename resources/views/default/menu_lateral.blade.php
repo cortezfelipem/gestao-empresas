@@ -58,7 +58,7 @@
 
 	<link rel="stylesheet" type="text/css" href="/css/font-awesome.min.css">
 
-	<link rel="shortcut icon" href="/../../imgs/slym.png" />
+	<link rel="shortcut icon" href="/imgs/{{ env('APP_LOGO', 'slym.png') }}" />
 
 	<script>
 		(function(h, o, t, j, a, r) {
@@ -105,11 +105,10 @@
 	<div id="kt_header_mobile" class="header-mobile align-items-center header-mobile-fixed">
 
 		<a href="/graficos">
-			<!-- <img width="100" alt="Logo" src="/../../imgs/slym.png" /> -->
 			@if($logo == "")
-			<img width="100" alt="Logo" src="../../imgs/slym.png" />
+			<img width="100" alt="{{ env('APP_NAME') }}" src="/imgs/{{ env('APP_LOGO', 'slym.png') }}" />
 			@else
-			<img width="120" height="45" alt="Logo" src="/logos/{{$logo}}" />
+			<img width="120" height="45" alt="{{ env('APP_NAME') }}" src="/logos/{{$logo}}" />
 			@endif
 		</a>
 
@@ -147,9 +146,9 @@
 
 					<a href="/graficos" class="brand-logo">
 						@if($logo == "")
-						<img width="100" alt="Logo" src="../../imgs/slym.png" />
+						<img width="100" alt="{{ env('APP_NAME') }}" src="/imgs/{{ env('APP_LOGO', 'slym.png') }}" />
 						@else
-						<img width="120" height="45" alt="Logo" src="/logos/{{$logo}}" />
+						<img width="120" height="45" alt="{{ env('APP_NAME') }}" src="/logos/{{$logo}}" />
 						@endif
 					</a>
 					
@@ -867,7 +866,7 @@
 					<div id="box_whatsapp" class="wcard">
 						<div class="wcard-header">
 							<div class="wcard-logo">
-								<img src="/imgs/slym.png" alt="Nome da empresa">
+								<img src="/imgs/{{ env('APP_LOGO', 'slym.png') }}" alt="{{ env('APP_NAME') }}">
 							</div>
 							<div class="wcard-title">
 								<h6>{{getenv("APP_NAME")}}</h6>
