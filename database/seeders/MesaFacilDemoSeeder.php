@@ -309,7 +309,7 @@ class MesaFacilDemoSeeder extends Seeder
                     'empresa_id'       => $this->empresaId,
                     'tema'             => 1,
                     'tema_menu'        => 1,
-                    'tipo_menu'        => 'admin',
+                    'tipo_menu'        => 'lateral',
                     'rota_acesso'      => $u['rota_acesso'],
                     'created_at'       => $this->now,
                     'updated_at'       => $this->now,
