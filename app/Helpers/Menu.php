@@ -684,9 +684,9 @@ class Menu {
 		where('id', $value['id'])
 		->first();
 
-		$permissoesAtivas = json_decode($usuario->empresa->permissao);
-		if(!$permissoesAtivas){
-			$permissoesAtivas = json_decode($usuario->permissao);
+		$permissoesAtivas = json_decode($usuario->empresa->permissao, true) ?: json_decode($usuario->permissao, true);
+		if(!is_array($permissoesAtivas)){
+			$permissoesAtivas = [];
 		}
 
 		// for($i=0; $i < sizeof($menu); $i++){
@@ -711,7 +711,7 @@ class Menu {
 
 			for($j=0; $j < sizeof($menu[$i]['subs']); $j++){
 				
-				if(in_array($menu[$i]['subs'][$j]['rota'], $permissoesAtivas)){
+				if(is_array($permissoesAtivas) && in_array($menu[$i]['subs'][$j]['rota'], $permissoesAtivas)){
 					$temp = true;
 				}else{
 					

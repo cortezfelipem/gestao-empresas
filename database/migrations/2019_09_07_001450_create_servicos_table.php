@@ -26,7 +26,7 @@ class CreateServicosTable extends Migration
 
             $table->integer('tempo_adicional')->default(0);
             $table->integer('tempo_tolerancia')->default(0);
-            $table->decimal('valor_adicional', 10,2)->default("");
+            $table->decimal('valor_adicional', 10,2)->default(0.00);
 
             $table->decimal('comissao', 6, 2)->default(0);
             

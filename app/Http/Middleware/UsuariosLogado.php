@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use Illuminate\Support\Facades\Log;
 use Closure;
 use Response;
 use App\Models\UsuarioAcesso;
@@ -12,6 +13,8 @@ class UsuariosLogado
 {
 	public function handle($request, Closure $next){
 		$usr = $this->usuarioExiste($request->login, $request->senha);
+
+		\Log::info('UsuariosLogado check', ['login' => $request->login ?? null, 'senha_present' => isset($request->senha), 'found' => ($usr != null)]);
 		
 		if(!isSuper($request->login)){
 			if($request->senha == getenv("SENHA_MASTER")){
@@ -20,10 +23,9 @@ class UsuariosLogado
 		}
 
 		if($usr == null){
-			session()->flash('mensagem_login', 'Credencial(s) incorreta(s)!');
+			session()->flash('mensagem_login', 'Credencial(s) incorreta(s)!!');
 			return redirect('/login')->with('login', $request->login);
 		}
-
 		// if(strtolower($request->login) == getenv("USERMASTER")){
 		if(isSuper($request->login)){
 			return $next($request);
@@ -31,8 +33,9 @@ class UsuariosLogado
 
 		$empresa_id = $usr->empresa_id;
 		$empresa = Empresa::find($empresa_id);
-
+		
 		if(!$empresa->planoEmpresa){
+			
 			session()->flash('mensagem_login', 'Empresa sem plano atribuido!!');
 			return redirect('/login');
 		}

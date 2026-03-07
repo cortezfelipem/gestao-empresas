@@ -1,352 +1,644 @@
 <!DOCTYPE html>
-
-<html lang="br">
-<!-- begin::Head -->
-
+<html lang="pt-br">
 <head>
 	<meta charset="utf-8" />
-
-	<title>Selecione o plano</title>
-	<meta name="description" content="Updates and statistics">
+	<title>{{getenv("APP_NAME")}} - Planos e Preços</title>
+	<meta name="description" content="Sistema completo de gestão empresarial - NF-e, NFC-e, CT-e, PDV e muito mais!">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
 	<!--begin::Fonts -->
-	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700|Roboto:300,400,500,600,700">
-
-	<link href="/metronic/css/fullcalendar.bundle.css" rel="stylesheet" type="text/css" />
-	<!-- <link href="/metronic/css/uppy.bundle.css" rel="stylesheet" type="text/css" /> -->
-	<link href="/metronic/css/wizard.css" rel="stylesheet" type="text/css" />
-
-	<link href="/css/style.css" rel="stylesheet" type="text/css" />
-
-	<!--end::Page Vendors Styles -->
-
-
-	<!--begin::Global Theme Styles(used by all pages) -->
-	<link href="/metronic/css/plugins.bundle.css" rel="stylesheet" type="text/css" />
-	<link href="/metronic/css/prismjs.bundle.css" rel="stylesheet" type="text/css" />
-	<link href="/metronic/css/style.bundle.css" rel="stylesheet" type="text/css" />
-
-	<link href="/metronic/css/pricing.css" rel="stylesheet" type="text/css" />
-	<!--end::Global Theme Styles -->
-
-	<!--begin::Layout Skins(used by all pages) -->
-
-	<link href="/metronic/css/light.css" rel="stylesheet" type="text/css" />
-	<link href="/metronic/css/light-menu.css" rel="stylesheet" type="text/css" />
-	<link href="/metronic/css/dark-brand.css" rel="stylesheet" type="text/css" />
-	<link href="/metronic/css/dark-aside.css" rel="stylesheet" type="text/css" />
-
-	<link rel="stylesheet" href="https://maxst.icons8.com/vue-static/landings/line-awesome/line-awesome/1.3.0/css/line-awesome.min.css">
-
-	<link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-
-	<link rel="shortcut icon" href="/../../imgs/slym.png" />
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 	
-	<script>
-		(function(h, o, t, j, a, r) {
-			h.hj = h.hj || function() {
-				(h.hj.q = h.hj.q || []).push(arguments)
-			};
-			h._hjSettings = {
-				hjid: 1070954,
-				hjsv: 6
-			};
-			a = o.getElementsByTagName('head')[0];
-			r = o.createElement('script');
-			r.async = 1;
-			r.src = t + h._hjSettings.hjid + j + h._hjSettings.hjsv;
-			a.appendChild(r);
-		})(window, document, 'https://static.hotjar.com/c/hotjar-', '.js?sv=');
-	</script>
-	<!-- Global site tag (gtag.js) - Google Analytics -->
-
-	<script>
-		window.dataLayer = window.dataLayer || [];
-
-		function gtag() {
-			dataLayer.push(arguments);
+	<link href="/metronic/css/plugins.bundle.css" rel="stylesheet" type="text/css" />
+	<link href="/metronic/css/style.bundle.css" rel="stylesheet" type="text/css" />
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+	<link rel="shortcut icon" href="/imgs/slym.png" />
+	
+	<style>
+		:root {
+			--primary-color: #3699FF;
+			--secondary-color: #1BC5BD;
+			--accent-color: #8950FC;
+			--dark-color: #181C32;
+			--gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+			--gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+			--gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+			--gradient-primary: linear-gradient(135deg, #3699FF 0%, #1BC5BD 100%);
 		}
-		gtag('js', new Date());
-		gtag('config', 'UA-37564768-1');
-	</script>
 
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
 
-	<style type="text/css">
-		.select2-selection__arroww:before {
-			content: "";
+		body {
+			font-family: 'Inter', sans-serif;
+			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+			min-height: 100vh;
+			overflow-x: hidden;
+		}
+
+		/* Animated Background */
+		.animated-bg {
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			z-index: 0;
+			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+			overflow: hidden;
+		}
+
+		.animated-bg::before {
+			content: '';
 			position: absolute;
-			right: 7px;
-			top: 42%;
-			border-top: 5px solid #888;
-			border-left: 4px solid transparent;
-			border-right: 4px solid transparent;
+			top: -50%;
+			left: -50%;
+			width: 200%;
+			height: 200%;
+			background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+			background-size: 50px 50px;
+			animation: moveBackground 20s linear infinite;
 		}
 
-		.h-t:hover{
+		@keyframes moveBackground {
+			0% { transform: translate(0, 0); }
+			100% { transform: translate(50px, 50px); }
+		}
+
+		/* Floating particles */
+		.particle {
+			position: absolute;
+			border-radius: 50%;
+			background: rgba(255, 255, 255, 0.1);
+			animation: float 15s infinite;
+		}
+
+		@keyframes float {
+			0%, 100% { transform: translateY(0) rotate(0deg); }
+			50% { transform: translateY(-100px) rotate(180deg); }
+		}
+
+		/* Header */
+		.header {
+			position: relative;
+			z-index: 10;
+			padding: 30px 0;
+			text-align: center;
+		}
+
+		.logo {
+			font-size: 2.5rem;
+			font-weight: 900;
+			color: white;
+			text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+			margin-bottom: 10px;
+		}
+
+		.tagline {
+			font-size: 1.2rem;
+			color: rgba(255,255,255,0.9);
+			font-weight: 300;
+		}
+
+		/* Main Container */
+		.main-container {
+			position: relative;
+			z-index: 10;
+			max-width: 1400px;
+			margin: 0 auto;
+			padding: 40px 20px;
+		}
+
+		/* Hero Section */
+		.hero-section {
+			text-align: center;
+			margin-bottom: 60px;
+			animation: fadeInDown 1s ease;
+		}
+
+		@keyframes fadeInDown {
+			from {
+				opacity: 0;
+				transform: translateY(-30px);
+			}
+			to {
+				opacity: 1;
+				transform: translateY(0);
+			}
+		}
+
+		.hero-title {
+			font-size: 3.5rem;
+			font-weight: 900;
+			color: white;
+			margin-bottom: 20px;
+			line-height: 1.2;
+			text-shadow: 0 4px 30px rgba(0,0,0,0.3);
+		}
+
+		.hero-subtitle {
+			font-size: 1.4rem;
+			color: rgba(255,255,255,0.95);
+			margin-bottom: 15px;
+			font-weight: 400;
+		}
+
+		.hero-badge {
+			display: inline-block;
+			background: rgba(255,255,255,0.2);
+			backdrop-filter: blur(10px);
+			padding: 12px 30px;
+			border-radius: 50px;
+			color: white;
+			font-weight: 600;
+			font-size: 1.1rem;
+			margin-top: 10px;
+			box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+		}
+
+		.hero-badge i {
+			margin-right: 8px;
+			color: #FFD700;
+		}
+
+		/* Features Grid */
+		.features-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+			gap: 20px;
+			margin-bottom: 60px;
+			animation: fadeInUp 1s ease 0.3s both;
+		}
+
+		@keyframes fadeInUp {
+			from {
+				opacity: 0;
+				transform: translateY(30px);
+			}
+			to {
+				opacity: 1;
+				transform: translateY(0);
+			}
+		}
+
+		.feature-card {
+			background: rgba(255,255,255,0.15);
+			backdrop-filter: blur(10px);
+			border-radius: 20px;
+			padding: 30px;
+			text-align: center;
+			border: 1px solid rgba(255,255,255,0.2);
+			transition: all 0.3s ease;
+		}
+
+		.feature-card:hover {
+			transform: translateY(-5px);
+			background: rgba(255,255,255,0.25);
+			box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+		}
+
+		.feature-icon {
+			font-size: 3rem;
+			margin-bottom: 15px;
+			background: linear-gradient(135deg, #FFD700, #FFA500);
+			-webkit-background-clip: text;
+			-webkit-text-fill-color: transparent;
+			background-clip: text;
+		}
+
+		.feature-title {
+			font-size: 1.2rem;
+			font-weight: 700;
+			color: white;
+			margin-bottom: 10px;
+		}
+
+		.feature-desc {
+			font-size: 0.95rem;
+			color: rgba(255,255,255,0.8);
+			line-height: 1.6;
+		}
+
+		/* Pricing Section */
+		.pricing-section {
+			margin-bottom: 60px;
+		}
+
+		.section-title {
+			text-align: center;
+			font-size: 2.5rem;
+			font-weight: 800;
+			color: white;
+			margin-bottom: 40px;
+			text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+		}
+
+		.pricing-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+			gap: 30px;
+			animation: fadeInUp 1s ease 0.5s both;
+		}
+
+		.pricing-card {
+			background: white;
+			border-radius: 25px;
+			padding: 40px 30px;
+			position: relative;
+			overflow: hidden;
+			transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+			box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+		}
+
+		.pricing-card::before {
+			content: '';
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			height: 6px;
+			background: var(--gradient-primary);
+		}
+
+		.pricing-card:hover {
+			transform: translateY(-10px) scale(1.02);
+			box-shadow: 0 30px 80px rgba(0,0,0,0.4);
+		}
+
+		.pricing-card.featured {
+			border: 3px solid #FFD700;
+			transform: scale(1.05);
+		}
+
+		.featured-badge {
+			position: absolute;
+			top: 20px;
+			right: -35px;
+			background: linear-gradient(135deg, #FFD700, #FFA500);
+			color: white;
+			padding: 8px 45px;
+			transform: rotate(45deg);
+			font-weight: 700;
+			font-size: 0.85rem;
+			box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+		}
+
+		.plan-icon {
+			width: 80px;
+			height: 80px;
+			margin: 0 auto 20px;
+			background: var(--gradient-primary);
+			border-radius: 50%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			box-shadow: 0 10px 30px rgba(54, 153, 255, 0.3);
+		}
+
+		.plan-icon img {
+			width: 60%;
+			height: 60%;
+			object-fit: contain;
+			filter: brightness(0) invert(1);
+		}
+
+		.plan-name {
+			font-size: 2rem;
+			font-weight: 800;
+			color: var(--dark-color);
+			margin-bottom: 15px;
+			text-align: center;
+		}
+
+		.plan-price {
+			text-align: center;
+			margin-bottom: 25px;
+		}
+
+		.price-value {
+			font-size: 3.5rem;
+			font-weight: 900;
+			color: var(--primary-color);
+			line-height: 1;
+		}
+
+		.price-period {
+			font-size: 1rem;
+			color: #6c757d;
+			font-weight: 500;
+		}
+
+		.plan-description {
+			text-align: center;
+			color: #6c757d;
+			margin-bottom: 30px;
+			line-height: 1.6;
+			min-height: 60px;
+		}
+
+		.plan-features {
+			list-style: none;
+			margin-bottom: 30px;
+		}
+
+		.plan-features li {
+			padding: 12px 0;
+			color: #495057;
+			font-size: 0.95rem;
+			display: flex;
+			align-items: center;
+			border-bottom: 1px solid #f0f0f0;
+		}
+
+		.plan-features li:last-child {
+			border-bottom: none;
+		}
+
+		.plan-features i {
+			color: var(--secondary-color);
+			margin-right: 12px;
+			font-size: 1.1rem;
+		}
+
+		.plan-cta {
+			display: block;
+			width: 100%;
+			padding: 18px;
+			background: var(--gradient-primary);
+			color: white;
+			text-align: center;
+			border: none;
+			border-radius: 50px;
+			font-size: 1.1rem;
+			font-weight: 700;
+			text-decoration: none;
+			transition: all 0.3s ease;
+			box-shadow: 0 10px 30px rgba(54, 153, 255, 0.3);
 			cursor: pointer;
+		}
+
+		.plan-cta:hover {
+			transform: translateY(-3px);
+			box-shadow: 0 15px 40px rgba(54, 153, 255, 0.5);
+			color: white;
+			text-decoration: none;
+		}
+
+		/* Footer */
+		.footer {
+			text-align: center;
+			padding: 40px 20px;
+			color: rgba(255,255,255,0.8);
+			position: relative;
+			z-index: 10;
+		}
+
+		.footer-links {
+			margin-bottom: 20px;
+		}
+
+		.footer-links a {
+			color: rgba(255,255,255,0.9);
+			text-decoration: none;
+			margin: 0 15px;
+			transition: color 0.3s;
+		}
+
+		.footer-links a:hover {
+			color: white;
+		}
+
+		/* Responsive */
+		@media (max-width: 768px) {
+			.hero-title {
+				font-size: 2.5rem;
+			}
+
+			.hero-subtitle {
+				font-size: 1.1rem;
+			}
+
+			.pricing-grid {
+				grid-template-columns: 1fr;
+			}
+
+			.pricing-card.featured {
+				transform: scale(1);
+			}
 		}
 	</style>
 </head>
 
 
-<!-- end::Head -->
+<body>
+	<!-- Animated Background -->
+	<div class="animated-bg">
+		<div class="particle" style="width: 100px; height: 100px; top: 10%; left: 10%; animation-delay: 0s;"></div>
+		<div class="particle" style="width: 60px; height: 60px; top: 60%; left: 80%; animation-delay: 2s;"></div>
+		<div class="particle" style="width: 80px; height: 80px; top: 80%; left: 20%; animation-delay: 4s;"></div>
+		<div class="particle" style="width: 120px; height: 120px; top: 30%; left: 70%; animation-delay: 1s;"></div>
+	</div>
 
-<!-- begin::Body -->
+	<!-- Header -->
+	<div class="header">
+		<div class="logo">{{getenv("APP_NAME")}}</div>
+		<div class="tagline">{{getenv("APP_DESC")}}</div>
+	</div>
 
-<body id="kt_body" class="header-fixed header-mobile-fixed subheader-enabled subheader-fixed aside-enabled aside-fixed aside-minimize-hoverable page-loading">
-
-
-	<div class="d-flex flex-column flex-root">
-		<!--begin::Login-->
-		<div class="login  flex-column flex-lg-row flex-column-fluid bg-white" id="kt_login">
-			<!--begin::Aside-->
-			<div class="login-aside d-flex flex-row-auto position-relative overflow-hidden" >
-				<!--begin: Aside Container-->
-				<div class="d-flex flex-column-fluid flex-column justify-content-between py-12 col-12 py-lg-12 px-lg-35">
-					<!--begin::Logo-->
-					
-					<!--end::Logo-->
-					<!--begin::Aside body-->
-					<div class="d-flex flex-column-fluid flex-column" >
-						
-						<!--begin::Signin-->
-						<div class="login-form login-signin py-2">
-							<!--begin::Form-->
-
-							<!--begin::Title-->
-							<div class="text-center pb-8">
-								<h2 class="font-weight-bolder text-dark font-size-h2 font-size-h1-lg">{!! getenv("TITUO_PLANO") !!}</h2>
-
-								@if(getenv("MENSAGEM_PLANO"))
-								<h4>{!! getenv("MENSAGEM_PLANO") !!}</h4>
-								@endif
-								@if(getenv("PLANO_AUTOMATICO_DIAS") > 0)
-								<p class="text-info">*Faça seu cadastro, e utilize grátis por {{getenv("PLANO_AUTOMATICO_DIAS")}} dia(s)</p>
-								@endif
-
-
-
-							</div>
-
-							<div class="row">
-
-								@foreach($planos as $p)
-
-								<div class="{{App\Models\Plano::divPlanos()}} h-t">
-									<!--begin::Nav Panel Widget 2-->
-									<div class="card card-custom card-stretch gutter-b">
-										<!--begin::Body-->
-										<div class="card-body">
-											<!--begin::Wrapper-->
-											<div class="d-flex justify-content-between flex-column pt-4 h-100">
-												<!--begin::Container-->
-												<div class="pb-5">
-													<!--begin::Header-->
-													<div class="d-flex flex-column flex-center">
-														<!--begin::Symbol-->
-														<div class="symbol symbol-120 symbol-circle symbol overflow-hidden">
-															<span class="symbol-label">
-																@if($p->img != '')
-																<img src="/imgs_planos/{{$p->img}}" class="h-100 align-self-end" alt="">
-																@else
-																<img src="/imgs_planos/sem_imagem.png" class="h-100 align-self-end" alt="">
-																@endif
-
-															</span>
-														</div>
-														<!--end::Symbol-->
-														<!--begin::Username-->
-														<a href="#" class="card-title font-weight-bolder text-dark-75 text-hover-primary font-size-h4 m-0 pt-7 pb-1">{{$p->nome}}</a>
-
-														<h2 class="card-title font-weight-bolder text-info text-hover-primary font-size-h4 m-0 pt-7 pb-1">R$ {{number_format($p->valor, 2, ',', '.')}}</h2>
-														<!--end::Username-->
-														<!--end::Info-->
-													</div>
-													<!--end::Header-->
-													<!--begin::Body-->
-													<div class="pt-1">
-														<!--begin::Text-->
-														<p class="text-dark-75 font-weight-nirmal font-size-lg m-0 pb-7">
-															{!! $p->descricao !!}
-														</p>
-														<!--end::Text-->
-
-														<!--end::Item-->
-													</div>
-													<!--end::Body-->
-												</div>
-												<!--eng::Container-->
-												<!--begin::Footer-->
-												<div class="d-flex flex-center" id="kt_sticky_toolbar_chat_toggler_1" data-toggle="tooltip" title="">
-													<a class="btn btn-primary font-weight-bolder font-size-sm py-3 px-14" href="/cadastro?plano={{$p->id}}">Escolher</a>
-												</div>
-												<!--end::Footer-->
-											</div>
-											<!--end::Wrapper-->
-										</div>
-										<!--end::Body-->
-									</div>
-									<!--end::Nav Panel Widget 2-->
-								</div>
-
-								@endforeach
-							</div>
-
-							<!--end::Form-->
-						</div>
-						
-					</div>
-					<!--end::Aside body-->
-
-					<!--end: Aside footer for desktop-->
-				</div>
-				<!--end: Aside Container-->
+	<!-- Main Container -->
+	<div class="main-container">
+		<!-- Hero Section -->
+		<div class="hero-section">
+			<h1 class="hero-title">{!! getenv("TITUO_PLANO") !!}</h1>
+			<p class="hero-subtitle">{!! getenv("MENSAGEM_PLANO") !!}</p>
+			@if(getenv("PLANO_AUTOMATICO_DIAS") > 0)
+			<div class="hero-badge">
+				<i class="fas fa-gift"></i>
+				Teste GRÁTIS por {{getenv("PLANO_AUTOMATICO_DIAS")}} dia(s) - Sem compromisso!
 			</div>
-			<!--begin::Aside-->
-			<!--begin::Content-->
-			
-			<!--end::Content-->
+			@endif
 		</div>
 
-		<!--end::Login-->
+		<!-- Features Grid -->
+		<div class="features-grid">
+			<div class="feature-card">
+				<div class="feature-icon">
+					<i class="fas fa-file-invoice"></i>
+				</div>
+				<h3 class="feature-title">Emissão de Notas</h3>
+				<p class="feature-desc">NF-e, NFC-e, CT-e e MDF-e totalmente integrado com SEFAZ</p>
+			</div>
+
+			<div class="feature-card">
+				<div class="feature-icon">
+					<i class="fas fa-chart-line"></i>
+				</div>
+				<h3 class="feature-title">Gestão Completa</h3>
+				<p class="feature-desc">Vendas, compras, estoque, financeiro e muito mais</p>
+			</div>
+
+			<div class="feature-card">
+				<div class="feature-icon">
+					<i class="fas fa-mobile-alt"></i>
+				</div>
+				<h3 class="feature-title">100% Online</h3>
+				<p class="feature-desc">Acesse de qualquer lugar, a qualquer momento</p>
+			</div>
+
+			<div class="feature-card">
+				<div class="feature-icon">
+					<i class="fas fa-shield-alt"></i>
+				</div>
+				<h3 class="feature-title">Seguro e Confiável</h3>
+				<p class="feature-desc">Seus dados protegidos com a melhor tecnologia</p>
+			</div>
+		</div>
+
+		<!-- Pricing Section -->
+		<div class="pricing-section">
+			<h2 class="section-title">Escolha o Melhor Plano para Você</h2>
+			
+			<div class="pricing-grid">
+				@foreach($planos as $index => $p)
+				<div class="pricing-card {{ $index == 1 ? 'featured' : '' }}">
+					@if($index == 1)
+					<div class="featured-badge">POPULAR</div>
+					@endif
+
+					<div class="plan-icon">
+						@if($p->img != '')
+						<img src="/imgs_planos/{{$p->img}}" alt="{{$p->nome}}">
+						@else
+						<i class="fas fa-rocket" style="font-size: 2.5rem; color: white;"></i>
+						@endif
+					</div>
+
+					<h3 class="plan-name">{{$p->nome}}</h3>
+
+					<div class="plan-price">
+						<div class="price-value">R$ {{number_format($p->valor, 2, ',', '.')}}</div>
+						<div class="price-period">/mês</div>
+					</div>
+
+					<div class="plan-description">
+						{!! $p->descricao !!}
+					</div>
+
+					<ul class="plan-features">
+						@if($p->maximo_clientes > 0)
+						<li><i class="fas fa-check-circle"></i> Até {{number_format($p->maximo_clientes, 0, ',', '.')}} clientes</li>
+						@else
+						<li><i class="fas fa-check-circle"></i> Clientes ilimitados</li>
+						@endif
+
+						@if($p->maximo_produtos > 0)
+						<li><i class="fas fa-check-circle"></i> Até {{number_format($p->maximo_produtos, 0, ',', '.')}} produtos</li>
+						@else
+						<li><i class="fas fa-check-circle"></i> Produtos ilimitados</li>
+						@endif
+
+						@if($p->maximo_nfes > 0)
+						<li><i class="fas fa-check-circle"></i> {{number_format($p->maximo_nfes, 0, ',', '.')}} NF-e/mês</li>
+						@else
+						<li><i class="fas fa-check-circle"></i> NF-e ilimitadas</li>
+						@endif
+
+						@if($p->maximo_nfces > 0)
+						<li><i class="fas fa-check-circle"></i> {{number_format($p->maximo_nfces, 0, ',', '.')}} NFC-e/mês</li>
+						@else
+						<li><i class="fas fa-check-circle"></i> NFC-e ilimitadas</li>
+						@endif
+
+						@if($p->maximo_usuario > 0)
+						<li><i class="fas fa-check-circle"></i> Até {{$p->maximo_usuario}} usuários</li>
+						@else
+						<li><i class="fas fa-check-circle"></i> Usuários ilimitados</li>
+						@endif
+
+						@if($p->delivery)
+						<li><i class="fas fa-check-circle"></i> Módulo Delivery</li>
+						@endif
+
+						@if($p->maximo_cte > 0)
+						<li><i class="fas fa-check-circle"></i> CT-e incluído</li>
+						@endif
+
+						@if($p->maximo_mdfe > 0)
+						<li><i class="fas fa-check-circle"></i> MDF-e incluído</li>
+						@endif
+
+						@if($p->armazenamento > 0)
+						<li><i class="fas fa-check-circle"></i> {{$p->armazenamento}}GB de armazenamento</li>
+						@endif
+
+						<li><i class="fas fa-check-circle"></i> Suporte técnico</li>
+						<li><i class="fas fa-check-circle"></i> Atualizações gratuitas</li>
+					</ul>
+
+					<a href="/cadastro?plano={{$p->id}}" class="plan-cta">
+						<i class="fas fa-rocket"></i> Começar Agora
+					</a>
+				</div>
+				@endforeach
+			</div>
+		</div>
+
+		<!-- Footer -->
+		<div class="footer">
+			<div class="footer-links">
+				<a href="/login"><i class="fas fa-sign-in-alt"></i> Já tenho conta</a>
+				<a href="https://wa.me/{{getenv('CONTATO_SUPORTE')}}"><i class="fab fa-whatsapp"></i> Suporte WhatsApp</a>
+				<a href="http://{{getenv('SITE_SUPORTE')}}"><i class="fas fa-globe"></i> Site</a>
+			</div>
+			<p>&copy; {{ date('Y') }} {{getenv("APP_NAME")}}. Todos os direitos reservados.</p>
+		</div>
 	</div>
-	<script>var HOST_URL = "/metronic/theme/html/tools/preview";</script>
-	<script>
-		var KTAppSettings = {
-			"breakpoints": {
-				"sm": 576,
-				"md": 768,
-				"lg": 992,
-				"xl": 1200,
-				"xxl": 1400
-			},
-			"colors": {
-				"theme": {
-					"base": {
-						"white": "#ffffff",
-						"primary": "#3699FF",
-						"secondary": "#E5EAEE",
-						"success": "#1BC5BD",
-						"info": "#8950FC",
-						"warning": "#FFA800",
-						"danger": "#F64E60",
-						"light": "#E4E6EF",
-						"dark": "#181C32"
-					},
-					"light": {
-						"white": "#ffffff",
-						"primary": "#E1F0FF",
-						"secondary": "#EBEDF3",
-						"success": "#C9F7F5",
-						"info": "#EEE5FF",
-						"warning": "#FFF4DE",
-						"danger": "#FFE2E5",
-						"light": "#F3F6F9",
-						"dark": "#D6D6E0"
-					},
-					"inverse": {
-						"white": "#ffffff",
-						"primary": "#ffffff",
-						"secondary": "#3F4254",
-						"success": "#ffffff",
-						"info": "#ffffff",
-						"warning": "#ffffff",
-						"danger": "#ffffff",
-						"light": "#464E5F",
-						"dark": "#ffffff"
-					}
-				},
-				"gray": {
-					"gray-100": "#F3F6F9",
-					"gray-200": "#EBEDF3",
-					"gray-300": "#E4E6EF",
-					"gray-400": "#D1D3E0",
-					"gray-500": "#B5B5C3",
-					"gray-600": "#7E8299",
-					"gray-700": "#5E6278",
-					"gray-800": "#3F4254",
-					"gray-900": "#181C32"
-				}
-			},
-			"font-family": "Poppins"
-		};
-	</script>
 
-
-
-	<!-- end::Global Config -->
-	<!--begin::Global Theme Bundle(used by all pages) -->
-
-	<script src="/metronic/js/plugins.bundle.js" type="text/javascript"></script>
-	<script src="/metronic/js/prismjs.bundle.js" type="text/javascript"></script>
-	<script src="/metronic/js/scripts.bundle.js" type="text/javascript"></script>
-	<script src="/metronic/js/fullcalendar.bundle.js" type="text/javascript"></script>
-	<script src="/metronic/js/file.js" type="text/javascript"></script>
-
-	<script src="/metronic/js/wizard.js" type="text/javascript"></script>
-	<script src="/metronic/js/user.js" type="text/javascript"></script>
-
-
-
-	<script type="text/javascript" src="/js/jquery.mask.min.js"></script>
-	<script type="text/javascript" src="/js/mascaras.js"></script>
-	<script src="/metronic/js/select2.js" type="text/javascript"></script>
-	<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/7.2.0/sweetalert2.all.min.js"></script> -->
+	<script src="/metronic/js/plugins.bundle.js"></script>
 	<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-
-
+	
 	<script>
+		// Smooth scroll animation
+		document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+			anchor.addEventListener('click', function (e) {
+				e.preventDefault();
+				const target = document.querySelector(this.getAttribute('href'));
+				if (target) {
+					target.scrollIntoView({
+						behavior: 'smooth',
+						block: 'start'
+					});
+				}
+			});
+		});
 
+		// Add entrance animation on scroll
+		const observerOptions = {
+			threshold: 0.1,
+			rootMargin: '0px 0px -50px 0px'
+		};
+
+		const observer = new IntersectionObserver((entries) => {
+			entries.forEach(entry => {
+				if (entry.isIntersecting) {
+					entry.target.style.opacity = '1';
+					entry.target.style.transform = 'translateY(0)';
+				}
+			});
+		}, observerOptions);
+
+		// Observe pricing cards
+		document.querySelectorAll('.pricing-card').forEach(card => {
+			card.style.opacity = '0';
+			card.style.transform = 'translateY(30px)';
+			card.style.transition = 'all 0.6s ease';
+			observer.observe(card);
+		});
 	</script>
-
-	<script type="text/javascript">
-		$('#consulta').click(() => {
-			$('#consulta').addClass('spinner');
-			let cnpj = $('#cnpj').val();
-
-			cnpj = cnpj.replace('.', '');
-			cnpj = cnpj.replace('.', '');
-			cnpj = cnpj.replace('-', '');
-			cnpj = cnpj.replace('/', '');
-
-			if(cnpj.length == 14){
-
-				$.ajax({
-
-					url: 'https://www.receitaws.com.br/v1/cnpj/'+cnpj, 
-					type: 'GET', 
-					crossDomain: true, 
-					dataType: 'jsonp', 
-					success: function(data) 
-					{ 
-						$('#consulta').removeClass('spinner');
-						console.log(data);
-						if(data.status == "ERROR"){
-							swal(data.message, "", "error")
-						}else{
-							$('#nome_empresa').val(data.nome)
-							$('#telefone').val(data.telefone.replace("(", "").replace(")", ""))
-							$('#cidade').val(data.municipio)
-							$('#email').val(data.email)
-
-						}
-
-					}, 
-					error: function(e) { 
-						$('#consulta').removeClass('spinner');
-						console.log(e)
-						swal("Alerta", "Nenhum retorno encontrado para este CNPJ, informe manualmente por gentileza", "warning")
-
-					},
-				});
-			}else{
-				swal("Alerta", "Informe corretamente o CNPJ", "warning")
-			}
-		})
-	</script>
-
 </body>
-<!-- end::Body -->
-
 </html>

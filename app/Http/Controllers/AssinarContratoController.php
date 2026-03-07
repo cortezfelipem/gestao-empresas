@@ -89,7 +89,7 @@ class AssinarContratoController extends Controller
 					'Name' => 'Marcos Bueno',
 					'Date' => date("Y.m.d H:i:s"),
 					'Reason' => 'Descreva o motivo da assinatura',
-					'ContactInfo' => '43920004769',
+					'ContactInfo' => '11978780961',
 				);
 
 				$pdf->setSourceFile(public_path('contratos/'.$cnpj.'.pdf'));
@@ -124,7 +124,7 @@ class AssinarContratoController extends Controller
 					'Name' => 'Marcos Bueno',
 					'Date' => date("Y.m.d H:i:s"),
 					'Reason' => 'Descreva o motivo da assinatura',
-					'ContactInfo' => '43920004769',
+				'ContactInfo' => '11978780961',
 				);
 
 				$pdf->setSourceFile(public_path('contratos/'.$cnpj.'.pdf'));
@@ -155,3 +155,4 @@ class AssinarContratoController extends Controller
 
 	}
 }
+

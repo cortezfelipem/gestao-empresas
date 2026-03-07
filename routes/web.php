@@ -1,9 +1,13 @@
 <?php
 
+Route::get('/', 'UserController@home');
 Route::get('/cadastro', 'UserController@cadastro');
 Route::post('/cadastro', 'UserController@salvarEmpresa');
 Route::get('/plano', 'UserController@plano');
 Route::post('/recuperarSenha', 'UserController@recuperarSenha');
+
+// Webhook Mercado Pago
+Route::post('/webhook/mercadopago', 'PaymentController@webhook');
 
 Route::group(['prefix' => '/ajax'], function(){
 	Route::get('/', 'AjaxController@index');

@@ -1,1 +1,1 @@
-<h1>Acesso não permitido, contate o dev para liberação! 43920004769 wahtsApp</h1>
+<h1>Acesso não permitido, contate o dev para liberação! 11978780961 wahtsApp</h1>

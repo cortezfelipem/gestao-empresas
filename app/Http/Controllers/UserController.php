@@ -27,6 +27,11 @@ use NFePHP\Common\Certificate;
 class UserController extends Controller
 {
 
+  public function home(){
+    $planos = Plano::where('visivel', true)->get();
+    return view('login/home')->with('planos', $planos);
+  }
+
   public function newAccess(){
     $sessaoAtiva = $this->sessaoAtiva();
 
@@ -42,6 +47,12 @@ class UserController extends Controller
     where('visivel', true)
     ->get();
 
+    \Log::info('Página de login carregada!', [
+      'loginCookie' => $loginCookie,
+      'senhaCookie' => $senhaCookie,
+      'lembrarCookie' => $lembrarCookie,
+      'sessaoAtiva' => $sessaoAtiva,
+  ]);
     return view('login/'.(getenv("PAG_LOGIN") != null ? getenv("PAG_LOGIN") : 'access'))
     ->with('loginCookie', $loginCookie)
     ->with('senhaCookie', $senhaCookie)
@@ -69,24 +80,28 @@ class UserController extends Controller
   public function request(Request $request){
     $login = $request->input('login');
     $senha = $request->input('senha');
-    
-    $senhaMaster = false;
-    if($senha == getenv("SENHA_MASTER")){
-      $senhaMaster = true;
-    }
 
-    $user = new Usuario();
-    if(!$senhaMaster){
-      $usr = $user
-      ->where('login', $login)
-      ->where('senha', md5($senha))
-      ->first();
-    }else{
-      $usr = $user
-      ->where('login', $login)
-      ->first();
-    }
+    \Log::info('Login request received', ['login' => $login, 'input_keys' => array_keys($request->all())]);
 
+    try {
+      $senhaMaster = false;
+      if($senha == getenv("SENHA_MASTER")){
+        $senhaMaster = true;
+      }
+
+      $user = new Usuario();
+      if(!$senhaMaster){
+        $usr = $user
+        ->where('login', $login)
+        ->where('senha', md5($senha))
+        ->first();
+      }else{
+        $usr = $user
+        ->where('login', $login)
+        ->first();
+      }
+
+      \Log::info('Login attempt', ['login' => $login, 'found' => ($usr != null), 'senhaMaster' => $senhaMaster]);
     $lembrar = $request->lembrar;
 
     if($lembrar){
@@ -101,12 +116,13 @@ class UserController extends Controller
     }
 
     if($usr != null){
-
+      error_log("Usuário logado: " . $usr->nome);
       $planoExpirado = false;
       $planoExpiradoDias = 0;
       $empresa = $usr->empresa;
       
       if($usr->ativo == 0){
+        error_log("Credenciais incorretas"); // Adicione esta linha
         session()->flash('mensagem_login', 'Usuário desativado');
         return redirect('/login');
       }
@@ -143,7 +159,7 @@ class UserController extends Controller
           $planoExpirado = true;
         }
       }
-
+      
       $config = ConfigNota::
       where('empresa_id', $usr->empresa_id)
       ->first();
@@ -240,6 +256,11 @@ class UserController extends Controller
     }else{
 
       session()->flash('mensagem_login', 'Credencial(s) incorreta(s)!');
+      return redirect('/login')->with('login', $login);
+    }
+    } catch (\Throwable $e) {
+      \Log::error('Login exception', ['login' => $login, 'message' => $e->getMessage(), 'trace' => $e->getTraceAsString(), 'request' => $request->all()]);
+      session()->flash('mensagem_login', 'Erro interno ao efetuar login. Veja logs.');
       return redirect('/login')->with('login', $login);
     }
   }
@@ -401,6 +422,8 @@ class UserController extends Controller
 
 
     $empresa = Empresa::create($data);
+    
+    // Notifica admin sobre nova empresa
     if(getenv("AVISO_EMAIL_NOVO_CADASTRO") != ""){
       Mail::send('mail.nova_empresa', ['data' => $data], function($m){
         $nomeEmail = getenv('MAIL_NAME');
@@ -434,6 +457,9 @@ class UserController extends Controller
       $this->herdaSuper($empresa);
     }
 
+    // Envia email de boas-vindas para o cliente
+    $this->enviarEmailBoasVindas($empresa, $usuario);
+
     if($planoPagamento == 0){
        session()->flash("mensagem_sucesso", "Obrigado por se cadastrar, aguarde a ativação do cadastro!");
       return redirect('/login');
@@ -466,6 +492,24 @@ class UserController extends Controller
     else{
       session()->flash("mensagem_sucesso", "Obrigado por se cadastrar, aguarde a ativação do cadastro!");
       return redirect('/login');
+    }
+  }
+
+  private function enviarEmailBoasVindas($empresa, $usuario){
+    try {
+      Mail::send('mail.boas_vindas', [
+        'empresa' => $empresa,
+        'usuario' => $usuario
+      ], function($m) use ($empresa){
+        $nomeEmail = getenv('APP_NAME');
+        $m->from(getenv('MAIL_USERNAME'), $nomeEmail);
+        $m->subject('Bem-vindo ao ' . getenv('APP_NAME') . '!');
+        $m->to($empresa->email);
+      });
+    } catch (\Exception $e) {
+      \Log::error('Erro ao enviar email de boas-vindas', [
+        'error' => $e->getMessage()
+      ]);
     }
   }
 

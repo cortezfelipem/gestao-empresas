@@ -41,7 +41,10 @@ class ValidaAcesso
 		}
 		$value = session('user_logged');
 		$usuario = Usuario::find($value['id']);
-		$permissao = json_decode($usuario->permissao);
+		$permissao = json_decode($usuario->permissao, true);
+		if(!is_array($permissao)){
+			$permissao = [];
+		}
 
 		// echo $uri;
 		// print_r($permissao);

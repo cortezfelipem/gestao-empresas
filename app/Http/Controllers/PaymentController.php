@@ -374,4 +374,143 @@ class PaymentController extends Controller
             return response()->json("erro", 404);
         }
     }
-}
+
+    /**
+     * Webhook do Mercado Pago
+     * Recebe notificações automáticas de mudança de status de pagamento
+     */
+    public function webhook(Request $request){
+        try {
+            \Log::info('Webhook Mercado Pago recebido', [
+                'type' => $request->type,
+                'action' => $request->action,
+                'data' => $request->all()
+            ]);
+
+            // Verifica se é notificação de pagamento
+            if ($request->type !== 'payment' && $request->action !== 'payment.updated') {
+                return response()->json(['status' => 'ignored'], 200);
+            }
+
+            // Obtém o ID do pagamento
+            $paymentId = $request->input('data.id');
+            
+            if (!$paymentId) {
+                \Log::warning('Webhook sem payment ID');
+                return response()->json(['status' => 'no_payment_id'], 200);
+            }
+
+            // Configura SDK do Mercado Pago
+            if(getenv("MERCADOPAGO_AMBIENTE") == 'sandbox'){
+                \MercadoPago\SDK::setAccessToken(getenv("MERCADOPAGO_ACCESS_TOKEN"));
+            }else{
+                \MercadoPago\SDK::setAccessToken(getenv("MERCADOPAGO_ACCESS_TOKEN_PRODUCAO"));
+            }
+
+            // Busca informações do pagamento no Mercado Pago
+            $mpPayment = \MercadoPago\Payment::find_by_id($paymentId);
+
+            if (!$mpPayment) {
+                \Log::warning('Pagamento não encontrado no Mercado Pago', ['id' => $paymentId]);
+                return response()->json(['status' => 'payment_not_found'], 404);
+            }
+
+            // Busca o pagamento no banco de dados
+            $payment = Payment::where('transacao_id', $paymentId)->first();
+
+            if (!$payment) {
+                \Log::warning('Pagamento não encontrado no sistema', ['transacao_id' => $paymentId]);
+                return response()->json(['status' => 'not_found_in_system'], 404);
+            }
+
+            $statusAnterior = $payment->status;
+            
+            // Atualiza status
+            $payment->status = $mpPayment->status;
+            $payment->status_detalhe = $mpPayment->status_detail;
+            $payment->save();
+
+            \Log::info('Status de pagamento atualizado', [
+                'payment_id' => $payment->id,
+                'status_anterior' => $statusAnterior,
+                'status_novo' => $mpPayment->status
+            ]);
+
+            // Se pagamento foi aprovado, ativa a licença
+            if ($mpPayment->status == 'approved' && $statusAnterior != 'approved') {
+                $this->setarLicenca($payment->plano);
+                
+                // Envia email de confirmação
+                $this->enviarEmailPagamentoAprovado($payment);
+                
+                \Log::info('Licença ativada automaticamente via webhook', [
+                    'payment_id' => $payment->id,
+                    'plano_empresa_id' => $payment->plano_id
+                ]);
+            }
+
+            // Se pagamento foi rejeitado ou cancelado
+            if (in_array($mpPayment->status, ['rejected', 'cancelled', 'refunded'])) {
+                $this->enviarEmailPagamentoFalhou($payment, $mpPayment->status_detail);
+            }
+
+            return response()->json(['status' => 'success'], 200);
+
+        } catch (\Exception $e) {
+            \Log::error('Erro ao processar webhook Mercado Pago', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Envia email de pagamento aprovado
+     */
+    private function enviarEmailPagamentoAprovado($payment){
+        try {
+            $empresa = $payment->empresa;
+            $plano = $payment->plano->plano;
+            
+            Mail::send('mail.pagamento_aprovado', [
+                'empresa' => $empresa,
+                'plano' => $plano,
+                'payment' => $payment,
+                'expiracao' => $payment->plano->expiracao
+            ], function($m) use ($empresa){
+                $nomeEmail = getenv('APP_NAME');
+                $m->from(getenv('MAIL_USERNAME'), $nomeEmail);
+                $m->subject('Pagamento Aprovado - Bem-vindo ao ' . getenv('APP_NAME'));
+                $m->to($empresa->email);
+            });
+        } catch (\Exception $e) {
+            \Log::error('Erro ao enviar email de pagamento aprovado', [
+                'error' => $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * Envia email de pagamento rejeitado
+     */
+    private function enviarEmailPagamentoFalhou($payment, $motivo){
+        try {
+            $empresa = $payment->empresa;
+            
+            Mail::send('mail.pagamento_falhou', [
+                'empresa' => $empresa,
+                'payment' => $payment,
+                'motivo' => $motivo
+            ], function($m) use ($empresa){
+                $nomeEmail = getenv('APP_NAME');
+                $m->from(getenv('MAIL_USERNAME'), $nomeEmail);
+                $m->subject('Problema com seu Pagamento - ' . getenv('APP_NAME'));
+                $m->to($empresa->email);
+            });
+        } catch (\Exception $e) {
+            \Log::error('Erro ao enviar email de pagamento falhou', [
+                'error' => $e->getMessage()
+            ]);
+        }
+    }

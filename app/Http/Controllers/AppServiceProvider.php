@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Providers;
+namespace App\Http\Controllers;
 
-use Illuminate\Support\ServiceProvider;
+use App\Http\Controllers\Controller;
 use App\Models\ItemCompra;
 use App\Models\Produto;
 use App\Models\Usuario;
@@ -16,31 +16,12 @@ use App\Models\PedidoEcommerce;
 use Illuminate\Http\Request;
 use App\Helpers\Menu;
 use Illuminate\Pagination\Paginator;
-use \DB;
+<?php
+// Arquivo de placeholder para evitar carregamento acidental do AppServiceProvider
+// Este arquivo foi esvaziado intencionalmente. O provider real está em
+// `app/Providers/AppServiceProvider.php`.
 
-class AppServiceProvider extends ServiceProvider
-{
-    /**
-     * Register any application services.
-     *
-     * @return void
-     */
-    public function register()
-    {
-        //
-    }
-
-    /**
-     * Bootstrap any application services.
-     *
-     * @return void
-     */
-    public function boot()
-    {
-        Paginator::useBootstrap();
-        view()->composer('*',function($view){
-
-            $menu = new Menu();
+?>
 
             // print_r($menu->getMenu());
 

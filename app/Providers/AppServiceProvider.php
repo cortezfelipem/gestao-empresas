@@ -159,7 +159,7 @@ class AppServiceProvider extends ServiceProvider
                 );
             }
 
-            if (\Schema::hasTable('produtos')){
+            if ($this->dbReady() && \Schema::hasTable('produtos')){
 
                 $produtos = Produto::
                 where('empresa_id', $empresa_id)
@@ -354,7 +354,7 @@ private function rotaAtiva(){
 }
 
 private function verificaItensSemValidade($empresa_id){
-    if (\Schema::hasTable('produtos')){
+    if ($this->dbReady() && \Schema::hasTable('produtos')){
         $produtos = Produto::select('id')
         ->where('alerta_vencimento', '>', 0)
         ->where('empresa_id', $empresa_id)
@@ -379,7 +379,7 @@ private function verificaItensSemValidade($empresa_id){
 }
 
 private function verificaValidadeProdutos($empresa_id){
-    if (\Schema::hasTable('item_compras')){
+    if ($this->dbReady() && \Schema::hasTable('item_compras')){
 
         $dataHoje = date('Y-m-d', strtotime("-30 days",strtotime(date('Y-m-d'))));
         $dataFutura = date('Y-m-d', strtotime("+30 days",strtotime(date('Y-m-d'))));
@@ -406,7 +406,7 @@ private function verificaValidadeProdutos($empresa_id){
 
 private function verificaContasPagar($empresa_id){
 
-    if (\Schema::hasTable('conta_pagars')){
+    if ($this->dbReady() && \Schema::hasTable('conta_pagars')){
         $dataHoje = date('Y-m-d', strtotime("-". getenv('ALERTA_CONTAS_DIAS') ." days",strtotime(date('Y-m-d'))));
         $dataFutura = date('Y-m-d', strtotime("+". getenv('ALERTA_CONTAS_DIAS') ." days",strtotime(date('Y-m-d'))));
 
@@ -422,7 +422,7 @@ private function verificaContasPagar($empresa_id){
 }
 
 private function verificaContasReceber($empresa_id){
-    if (\Schema::hasTable('conta_recebers')){
+    if ($this->dbReady() && \Schema::hasTable('conta_recebers')){
         $dataHoje = date('Y-m-d', strtotime("-". getenv('ALERTA_CONTAS_DIAS') ." days",strtotime(date('Y-m-d'))));
         $dataFutura = date('Y-m-d', strtotime("+". getenv('ALERTA_CONTAS_DIAS') ." days",strtotime(date('Y-m-d'))));
 
@@ -438,7 +438,7 @@ private function verificaContasReceber($empresa_id){
 }
 
 private function verificaPedidosEcommerce($empresa_id){
-    if (\Schema::hasTable('pedido_ecommerces')){
+    if ($this->dbReady() && \Schema::hasTable('pedido_ecommerces')){
 
         $pedidos = PedidoEcommerce::
         where('status_preparacao', 0)
@@ -470,6 +470,31 @@ private function totalArmazenamento($empresa){
     }
 
     return $soma;
+}
+
+private function dbReady(){
+    try{
+        $default = config('database.default');
+        if ($default === 'sqlite'){
+            $db = config('database.connections.sqlite.database');
+            if (!$db) return false;
+            // try both as given and as base_path (relative)
+            if (file_exists($db)) return true;
+            if (file_exists(base_path($db))) return true;
+            return false;
+        }
+
+        // for other drivers, try to get a PDO instance
+        try{
+            \DB::getPdo();
+            return true;
+        }catch(\Exception $e){
+            return false;
+        }
+
+    }catch(\Exception $e){
+        return false;
+    }
 }
 
 

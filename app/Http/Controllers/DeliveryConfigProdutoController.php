@@ -194,7 +194,7 @@ class DeliveryConfigProdutoController extends Controller
         $request->merge([ 'path' => $nomeImagem ]);
         $request->merge([ 'produto_id' => $produtoDeliveryId ]);
 
-        $produtoDelivery = ProdutoDelivery;:find($produtoDeliveryId);
+        $produtoDelivery = ProdutoDelivery::find($produtoDeliveryId);
 
         $upload = $file->move(public_path('imagens_produtos'), $nomeImagem);
 
