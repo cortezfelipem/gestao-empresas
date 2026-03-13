@@ -30,6 +30,10 @@ Route::get('/error', function(){
 	return view('sempermissao')->with('title', 'Acesso Bloqueado');
 });
 
+// Log de erros do sistema (apenas super usuários)
+Route::get('/erros', 'ErrosAppController@index')->middleware('validaAcesso');
+Route::post('/erros/limpar', 'ErrosAppController@limpar')->middleware('validaAcesso');
+
 Route::group(['prefix' => 'migrador'], function(){
 	Route::get('/{empresa_id}', 'MigradorController@index');
 	Route::post('/', 'MigradorController@save');

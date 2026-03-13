@@ -249,7 +249,8 @@ class MesaFacilDemoSeeder extends Seeder
         $rotasCaixa = json_encode([
             '/graficos', '/mesas', '/pedidos', '/pedidos/controleComandas',
             '/caixa', '/contasPagar', '/contasReceber', '/fluxoCaixa',
-            '/clientes', '/formasPagamento',
+            '/clientes', '/categorias', '/produtos',
+            '/formasPagamento', '/relatorios',
         ]);
 
         // Rotas da cozinha (apenas visualização de produção)
